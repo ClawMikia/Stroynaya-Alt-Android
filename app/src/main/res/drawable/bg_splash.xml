@@ -1,24 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
-    <!-- Absolute black base -->
+    <!-- Dark Red base -->
     <item>
         <shape android:shape="rectangle">
-            <solid android:color="#020206" />
+            <solid android:color="@color/bg_abyss" />
         </shape>
     </item>
-    <!-- Top-left violet bloom -->
+    <!-- Top-left red bloom -->
     <item>
         <shape android:shape="rectangle">
             <gradient
                 android:centerX="0.1"
                 android:centerY="0.08"
                 android:endColor="#00000000"
-                android:gradientRadius="400dp"
-                android:startColor="#559D00FF"
+                android:gradientRadius="250dp"
+                android:startColor="@color/neon_violet"
                 android:type="radial" />
         </shape>
     </item>
-    <!-- Bottom-right cyan bloom -->
+    <!-- Bottom-right red bloom -->
     <item>
         <shape android:shape="rectangle">
             <gradient
@@ -26,11 +26,11 @@
                 android:centerY="0.94"
                 android:endColor="#00000000"
                 android:gradientRadius="360dp"
-                android:startColor="#3300F5FF"
+                android:startColor="#33FF0000"
                 android:type="radial" />
         </shape>
     </item>
-    <!-- Centre subtle magenta haze -->
+    <!-- Centre subtle red haze -->
     <item>
         <shape android:shape="rectangle">
             <gradient
@@ -38,7 +38,7 @@
                 android:centerY="0.5"
                 android:endColor="#00000000"
                 android:gradientRadius="280dp"
-                android:startColor="#1AFF007A"
+                android:startColor="#1AFF5252"
                 android:type="radial" />
         </shape>
     </item>

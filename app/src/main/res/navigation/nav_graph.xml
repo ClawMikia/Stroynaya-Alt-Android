@@ -18,7 +18,7 @@
             app:destination="@id/importFragment" />
         <action
             android:id="@+id/action_library_to_reel"
-            app:destination="@id/reelFragment" />
+            app:destination="@id/reelStudioFragment" />
     </fragment>
 
     <fragment
@@ -54,18 +54,6 @@
     </fragment>
 
     <fragment
-        android:id="@+id/importFragment"
-        android:name="com.hiraeth.flame.ui.mediaimport.ImportFragment"
-        android:label="Import"
-        tools:layout="@layout/fragment_import">
-        <action
-            android:id="@+id/action_import_to_detail"
-            app:destination="@id/mediaDetailFragment"
-            app:popUpTo="@id/importFragment"
-            app:popUpToInclusive="true" />
-    </fragment>
-
-    <fragment
         android:id="@+id/mediaDetailFragment"
         android:name="com.hiraeth.flame.ui.detail.MediaDetailFragment"
         android:label="Details"
@@ -93,12 +81,23 @@
     </fragment>
 
     <fragment
-        android:id="@+id/reelFragment"
+        android:id="@+id/importFragment"
+        android:name="com.hiraeth.flame.ui.mediaimport.ImportFragment"
+        android:label="Import"
+        tools:layout="@layout/fragment_import">
+        <action
+            android:id="@+id/action_import_to_detail"
+            app:destination="@id/mediaDetailFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/reelStudioFragment"
         android:name="com.hiraeth.flame.ui.reel.ReelStudioFragment"
-        android:label="Reel studio"
+        android:label="Reel Studio"
         tools:layout="@layout/fragment_reel">
         <action
             android:id="@+id/action_reel_to_detail"
             app:destination="@id/mediaDetailFragment" />
     </fragment>
+
 </navigation>

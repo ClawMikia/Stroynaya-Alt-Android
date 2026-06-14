@@ -4,7 +4,6 @@ package com.hiraeth.flame.domain
 enum class MediaTypeFilter {
     All,
     ImagesOnly,
-    VideosOnly,
 }
 
 /** Sort options mapped to UI and comparator logic in [com.hiraeth.flame.ui.library.LibraryViewModel]. */

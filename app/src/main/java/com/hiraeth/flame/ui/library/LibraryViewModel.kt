@@ -61,7 +61,6 @@ class LibraryViewModel(
                 when (tf) {
                     MediaTypeFilter.All -> true
                     MediaTypeFilter.ImagesOnly -> !entity.isVideo
-                    MediaTypeFilter.VideosOnly -> entity.isVideo
                 }
             }
             .sortedWith(comparatorFor(s))

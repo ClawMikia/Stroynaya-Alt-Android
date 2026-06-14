@@ -2,23 +2,13 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
-        android:id="@+id/action_quick_import"
-        android:icon="@android:drawable/ic_menu_add"
-        android:title="Quick Import"
-        app:showAsAction="always" />
-    <item
         android:id="@+id/action_toggle_view"
         android:icon="@android:drawable/ic_menu_view"
         android:title="List / grid"
         app:showAsAction="always" />
     <item
-        android:id="@+id/action_reel"
-        android:icon="@android:drawable/ic_media_play"
-        android:title="Reel studio"
-        app:showAsAction="always" />
-    <item
         android:id="@+id/action_combine"
-        android:icon="@android:drawable/ic_input_add"
+        android:icon="@android:drawable/ic_menu_add"
         android:title="@string/action_combine"
         app:showAsAction="always" />
 </menu>

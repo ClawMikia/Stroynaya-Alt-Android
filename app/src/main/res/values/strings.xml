@@ -1,26 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Hiraeth Flame</string>
-    <string name="nav_library">Library</string>
-    <string name="nav_camera">Camera</string>
-    <string name="nav_albums">Albums</string>
-    <string name="fullscreen">Fullscreen</string>
-    <string name="splash_credit">\"A dragon breaths fire with no smoke.\"</string>
+    <string name="app_name">Stroynaya Alt (Стройная Альт)</string>
+    <string name="nav_library">The Great Library</string>
+    <string name="nav_camera">Royal Camera</string>
+    <string name="nav_albums">Ancient Vaults</string>
+    <string name="fullscreen">Full Realm</string>
+    <string name="splash_credit">\"Визуализируй своё предкартиние эстетично. Любая человеческая фигура любви, принимающая падение и взлёт.\"</string>
     <string name="splash_author">- Christopher Lee Cajes</string>
-    <string name="nav_previous">Previous</string>
-    <string name="nav_next">Next</string>
+    <string name="nav_previous">Previous Soul</string>
+    <string name="nav_next">Next Soul</string>
     <string name="media_index_format">%1$d of %2$d</string>
-    <string name="delete_confirmation_title">Delete Media?</string>
-    <string name="delete_confirmation_message">Are you sure you want to permanently delete this item from your library?</string>
-    <string name="action_delete">Delete</string>
-    <string name="action_cancel">Cancel</string>
-    <string name="action_quick_import">Quick Import</string>
-    <string name="action_combine">Combine Images</string>
-    <string name="files_selected_count">%1$d files selected</string>
-    <string name="action_edit_image">Edit Image</string>
-    <string name="brightness">Brightness</string>
-    <string name="rotate">Rotate</string>
-    <string name="crop">Crop</string>
-    <string name="save_changes">Save Changes</string>
-    <string name="image_editor">Image Editor</string>
+    <string name="delete_confirmation_title">Banish from Realm?</string>
+    <string name="delete_confirmation_message">Are you sure you want to permanently banish this item from your library?</string>
+    <string name="action_delete">Banish</string>
+    <string name="action_cancel">Spare</string>
+    <string name="action_quick_import">Quick Summon</string>
+    <string name="action_combine">Forge Tapestry</string>
+    <string name="files_selected_count">%1$d souls selected</string>
+    <string name="action_edit_image">Enchant Image</string>
+    <string name="brightness">Luminescence</string>
+    <string name="rotate">Twist</string>
+    <string name="crop">Cut</string>
+    <string name="save_changes">Seal Enchantment</string>
+    <string name="image_editor">Arcane Editor</string>
 </resources>

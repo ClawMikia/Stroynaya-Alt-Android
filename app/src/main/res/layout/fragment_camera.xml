@@ -18,7 +18,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
-    <!-- Status message (read-only, shows over preview) -->
+    <!-- Status message -->
     <TextView
         android:id="@+id/camera_message"
         android:layout_width="0dp"
@@ -27,14 +27,14 @@
         android:layout_marginEnd="16dp"
         android:layout_marginTop="8dp"
         android:gravity="center"
-        android:textColor="@color/neon_cyan"
+        android:textColor="@color/neon_violet"
         android:textSize="13sp"
         android:alpha="0.85"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/toolbar" />
 
-    <!-- Camera Preview - takes full remaining space -->
+    <!-- Camera Preview -->
     <androidx.camera.view.PreviewView
         android:id="@+id/preview_view"
         android:layout_width="0dp"
@@ -60,23 +60,10 @@
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btn_photo"
             style="@style/Btn.Neon"
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="52dp"
-            android:layout_marginEnd="4dp"
-            android:layout_weight="1"
-            android:text="Photo"
+            android:text="Capture Photo"
             android:textColor="@color/neon_violet" />
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btn_record"
-            style="@style/Btn.Neon"
-            android:layout_width="0dp"
-            android:layout_height="52dp"
-            android:layout_marginStart="4dp"
-            android:layout_weight="1"
-            android:text="Record"
-            android:textColor="@color/neon_magenta"
-            app:strokeColor="@color/neon_magenta" />
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

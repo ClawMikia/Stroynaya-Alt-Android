@@ -20,11 +20,12 @@ class SplashActivity : AppCompatActivity() {
         val icon = findViewById<View>(R.id.splashIcon)
         val title = findViewById<View>(R.id.splashTitle)
         val divider = findViewById<View>(R.id.splash_divider)
+        val quoteContainer = findViewById<View>(R.id.quote_container)
         val quote = findViewById<View>(R.id.splashQuote)
         val author = findViewById<View>(R.id.splashAuthor)
 
         // Start invisible
-        listOf(icon, title, divider, quote, author).forEach {
+        listOf(icon, title, divider, quoteContainer, quote, author).forEach {
             it?.alpha = 0f
             it?.translationY = 40f
         }
@@ -47,7 +48,8 @@ class SplashActivity : AppCompatActivity() {
         animateIn(icon, 0)
         animateIn(title, delay)
         animateIn(divider, delay * 2)
-        animateIn(quote, delay * 3)
+        animateIn(quoteContainer, delay * 3)
+        animateIn(quote, delay * 3 + 100)
         animateIn(author, delay * 4)
 
         Handler(Looper.getMainLooper()).postDelayed({

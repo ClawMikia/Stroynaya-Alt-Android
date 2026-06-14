@@ -37,7 +37,7 @@
                 style="@style/TextInput.Neon"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Search media…">
+                android:hint="Search images…">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/search_input"
@@ -47,46 +47,6 @@
                     android:maxLines="1"
                     android:textColor="@color/text_primary" />
             </com.google.android.material.textfield.TextInputLayout>
-
-            <!-- Filter chips row -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:orientation="horizontal">
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/filter_all"
-                    style="@style/Btn.Neon.Tonal"
-                    android:layout_width="wrap_content"
-                    android:layout_height="36dp"
-                    android:paddingStart="14dp"
-                    android:paddingEnd="14dp"
-                    android:text="All"
-                    android:textSize="13sp" />
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/filter_photos"
-                    style="@style/Btn.Neon.Tonal"
-                    android:layout_width="wrap_content"
-                    android:layout_height="36dp"
-                    android:layout_marginStart="8dp"
-                    android:paddingStart="14dp"
-                    android:paddingEnd="14dp"
-                    android:text="Photos"
-                    android:textSize="13sp" />
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/filter_videos"
-                    style="@style/Btn.Neon.Tonal"
-                    android:layout_width="wrap_content"
-                    android:layout_height="36dp"
-                    android:layout_marginStart="8dp"
-                    android:paddingStart="14dp"
-                    android:paddingEnd="14dp"
-                    android:text="Videos"
-                    android:textSize="13sp" />
-            </LinearLayout>
 
             <!-- Tag filter -->
             <com.google.android.material.textfield.TextInputLayout
@@ -150,20 +110,5 @@
         android:paddingBottom="88dp"
         android:paddingTop="8dp"
         app:layout_behavior="@string/appbar_scrolling_view_behavior" />
-
-    <!-- Import FAB -->
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fab_import"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
-        android:layout_margin="@dimen/fab_margin"
-        android:contentDescription="Import media"
-        android:src="@android:drawable/ic_input_add"
-        app:backgroundTint="@color/bg_card"
-        app:borderWidth="0dp"
-        app:elevation="4dp"
-        app:maxImageSize="28dp"
-        app:tint="@color/neon_violet" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

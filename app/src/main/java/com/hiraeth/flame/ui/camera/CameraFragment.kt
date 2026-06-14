@@ -1,7 +1,5 @@
 package com.hiraeth.flame.ui.camera
 
-import android.Manifest
-import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -12,13 +10,6 @@ import androidx.camera.core.ImageCapture
 import androidx.camera.core.ImageCaptureException
 import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
-import androidx.camera.video.FileOutputOptions
-import androidx.camera.video.Quality
-import androidx.camera.video.QualitySelector
-import androidx.camera.video.Recorder
-import androidx.camera.video.Recording
-import androidx.camera.video.VideoCapture
-import androidx.camera.video.VideoRecordEvent
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -45,8 +36,6 @@ class CameraFragment : Fragment() {
     }
 
     private var imageCapture: ImageCapture? = null
-    private var videoCapture: VideoCapture<Recorder>? = null
-    private var activeRecording: Recording? = null
     private lateinit var mainExecutor: Executor
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
@@ -80,12 +69,6 @@ class CameraFragment : Fragment() {
                 launch {
                     viewModel.captureOrientation.collect {
                         bindCameraUseCases()
-                        updateOrientationButtonLabel()
-                    }
-                }
-                launch {
-                    viewModel.recording.collect { rec ->
-                        binding.btnRecord.text = if (rec) "Stop" else "Record"
                     }
                 }
                 launch {
@@ -117,9 +100,8 @@ class CameraFragment : Fragment() {
                                             typedTitle,
                                             typedDescription
                                         )
-                                        Toast.makeText(requireContext(), "Changes saved successfully", Toast.LENGTH_SHORT).show()
+                                        Toast.makeText(requireContext(), "Saved to Kingdom!", Toast.LENGTH_SHORT).show()
 
-                                        // ✅ FIXED: Direct navigation to the Detail Fragment destination ID
                                         findNavController().navigate(
                                             R.id.mediaDetailFragment,
                                             androidx.core.os.bundleOf(
@@ -128,7 +110,7 @@ class CameraFragment : Fragment() {
                                             )
                                         )
                                     } catch (e: Exception) {
-                                        Toast.makeText(requireContext(), "Save failed: ${e.localizedMessage}", Toast.LENGTH_LONG).show()
+                                        Toast.makeText(requireContext(), "Capture failed: ${e.localizedMessage}", Toast.LENGTH_LONG).show()
                                     }
                                 }
                             },
@@ -142,77 +124,6 @@ class CameraFragment : Fragment() {
                 },
             )
         }
-
-        binding.btnRecord.setOnClickListener {
-            val vc = videoCapture ?: return@setOnClickListener
-            val isRecording = viewModel.recording.value
-            if (!isRecording) {
-                if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.RECORD_AUDIO)
-                    != PackageManager.PERMISSION_GRANTED
-                ) {
-                    (activity as? com.hiraeth.flame.MainActivity)?.requestAppPermissions()
-                    return@setOnClickListener
-                }
-                val file = viewModel.createVideoOutputFile()
-                val opts = FileOutputOptions.Builder(file).build()
-                viewModel.setRecording(value = true)
-                activeRecording = vc.output
-                    .prepareRecording(requireContext(), opts)
-                    .withAudioEnabled()
-                    .start(mainExecutor) { event ->
-                        when (event) {
-                            is VideoRecordEvent.Finalize -> {
-                                viewModel.setRecording(false)
-                                activeRecording = null
-                                if (!event.hasError()) {
-                                    val detailsDialog = CaptureDetailsDialogFragment.newInstance()
-                                    detailsDialog.setListeners(
-                                        onSaved = { typedTitle, typedDescription ->
-                                            viewLifecycleOwner.lifecycleScope.launch {
-                                                try {
-                                                    val newMediaId = container.mediaRepository.registerCapturedVideo(
-                                                        file,
-                                                        typedTitle,
-                                                        typedDescription
-                                                    )
-                                                    Toast.makeText(requireContext(), "Changes saved successfully", Toast.LENGTH_SHORT).show()
-
-                                                    // ✅ FIXED: Direct navigation to the Detail Fragment destination ID
-                                                    findNavController().navigate(
-                                                        R.id.mediaDetailFragment,
-                                                        androidx.core.os.bundleOf(
-                                                            "mediaId" to newMediaId,
-                                                            "albumId" to -1L
-                                                        )
-                                                    )
-                                                } catch (e: Exception) {
-                                                    Toast.makeText(requireContext(), "Save failed: ${e.localizedMessage}", Toast.LENGTH_LONG).show()
-                                                }
-                                            }
-                                        },
-                                        onCancelled = {
-                                            if (file.exists()) file.delete()
-                                            Toast.makeText(requireContext(), "Capture discarded", Toast.LENGTH_SHORT).show()
-                                        }
-                                    )
-                                    detailsDialog.show(childFragmentManager, "capture_details_entry")
-                                }
-                            }
-                        }
-                    }
-            } else {
-                activeRecording?.stop()
-                activeRecording = null
-                viewModel.setRecording(false)
-            }
-        }
-
-        // Initialize orientation button label
-        updateOrientationButtonLabel()
-    }
-
-    private fun updateOrientationButtonLabel() {
-        // No UI element currently shows the orientation label
     }
 
     private fun bindCameraUseCases() {
@@ -233,26 +144,17 @@ class CameraFragment : Fragment() {
                     .setTargetRotation(targetRotation)
                     .build()
 
-                val recorder = Recorder.Builder()
-                    .setQualitySelector(QualitySelector.from(Quality.HIGHEST))
-                    .build()
-
-                val video = VideoCapture.withOutput(recorder)
-
                 try {
                     cameraProvider.unbindAll()
                     cameraProvider.bindToLifecycle(
                         viewLifecycleOwner,
                         selector,
                         preview,
-                        capture,
-                        video,
+                        capture
                     )
                     imageCapture = capture
-                    videoCapture = video
                 } catch (_: Exception) {
                     imageCapture = null
-                    videoCapture = null
                 }
             },
             mainExecutor,
@@ -261,8 +163,6 @@ class CameraFragment : Fragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
-        activeRecording?.stop()
-        activeRecording = null
         runCatching {
             ProcessCameraProvider.getInstance(requireContext()).get().unbindAll()
         }

@@ -83,10 +83,7 @@ class MediaDetailFragment : Fragment() {
                     val item = pagerAdapter.currentList.getOrNull(position)
                     if (item != null) {
                         viewModel.setCurrentId(item.id)
-                        pagerAdapter.playVideo(
-                            position,
-                            binding.viewPager.getChildAt(0) as androidx.recyclerview.widget.RecyclerView,
-                        )
+                        pagerAdapter.playVideo(position, binding.viewPager.getChildAt(0) as androidx.recyclerview.widget.RecyclerView)
                     }
                 }
             },

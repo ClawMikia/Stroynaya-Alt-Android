@@ -6,7 +6,6 @@ import android.graphics.BitmapFactory
 import android.graphics.Canvas
 import android.os.Bundle
 import android.text.Editable
-import android.text.InputType
 import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
@@ -34,10 +33,8 @@ import com.hiraeth.flame.domain.LibraryViewMode
 import com.hiraeth.flame.domain.MediaTypeFilter
 import com.hiraeth.flame.ui.util.AppPermissions
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.util.Collections
 
 class LibraryFragment : Fragment() {
 
@@ -121,18 +118,6 @@ class LibraryFragment : Fragment() {
             override fun afterTextChanged(s: Editable?) {}
         })
 
-        binding.filterAll.setOnClickListener { viewModel.setTypeFilter(MediaTypeFilter.All) }
-        binding.filterPhotos.setOnClickListener { viewModel.setTypeFilter(MediaTypeFilter.ImagesOnly) }
-        binding.filterVideos.setOnClickListener { viewModel.setTypeFilter(MediaTypeFilter.VideosOnly) }
-
-        binding.fabImport.setOnClickListener {
-            if (hasAllPermissions()) {
-                findNavController().navigate(R.id.action_library_to_import)
-            } else {
-                (activity as? com.hiraeth.flame.MainActivity)?.requestAppPermissions()
-            }
-        }
-
         binding.btnGrantPermissions.setOnClickListener {
             (activity as? com.hiraeth.flame.MainActivity)?.requestAppPermissions()
         }
@@ -145,20 +130,8 @@ class LibraryFragment : Fragment() {
         binding.toolbar.inflateMenu(R.menu.menu_library)
         binding.toolbar.setOnMenuItemClickListener { item ->
             when (item.itemId) {
-                R.id.action_quick_import -> {
-                    if (hasAllPermissions()) {
-                        quickImportLauncher.launch("*/*")
-                    } else {
-                        (activity as? com.hiraeth.flame.MainActivity)?.requestAppPermissions()
-                    }
-                    true
-                }
                 R.id.action_toggle_view -> {
                     viewModel.toggleViewMode()
-                    true
-                }
-                R.id.action_reel -> {
-                    findNavController().navigate(R.id.action_library_to_reel)
                     true
                 }
                 R.id.action_combine -> {
@@ -243,28 +216,21 @@ class LibraryFragment : Fragment() {
                     if (bitmaps.isEmpty()) return@withContext null
 
                     val n = bitmaps.size
-                    val cols = Math.ceil(Math.sqrt(n.toDouble())).toInt()
-                    val rows = Math.ceil(n.toDouble() / cols).toInt()
-
                     val cellWidth = bitmaps.maxOf { it.width }
                     val cellHeight = bitmaps.maxOf { it.height }
                     
-                    val totalWidth = cellWidth * cols
-                    val totalHeight = cellHeight * rows
+                    val totalWidth = cellWidth * n
+                    val totalHeight = cellHeight
                     
                     val result = Bitmap.createBitmap(totalWidth, totalHeight, Bitmap.Config.ARGB_8888)
                     val canvas = Canvas(result)
-                    canvas.drawColor(android.graphics.Color.BLACK) // Background for gaps
+                    canvas.drawColor(android.graphics.Color.BLACK)
 
                     for (i in bitmaps.indices) {
-                        val r = i / cols
-                        val c = i % cols
                         val b = bitmaps[i]
+                        val left = i * cellWidth.toFloat()
+                        val top = 0f
                         
-                        val left = c * cellWidth.toFloat()
-                        val top = r * cellHeight.toFloat()
-                        
-                        // Calculate Center Crop matrix
                         val matrix = android.graphics.Matrix()
                         val scale: Float
                         var dx = 0f
@@ -281,7 +247,6 @@ class LibraryFragment : Fragment() {
                         matrix.setScale(scale, scale)
                         matrix.postTranslate(left + dx, top + dy)
                         
-                        // Clip to cell
                         canvas.save()
                         canvas.clipRect(left, top, left + cellWidth, top + cellHeight)
                         canvas.drawBitmap(b, matrix, null)
@@ -293,7 +258,7 @@ class LibraryFragment : Fragment() {
                 if (bitmap != null) {
                     container.mediaRepository.saveBitmapAsMedia(
                         bitmap, 
-                        "Combined Image", 
+                        "Combined",
                         "Created by combining ${selected.size} images"
                     )
                     Toast.makeText(requireContext(), "Image combined and saved!", Toast.LENGTH_SHORT).show()

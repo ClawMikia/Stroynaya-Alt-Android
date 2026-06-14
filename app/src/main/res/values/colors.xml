@@ -1,27 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Neon Core Palette -->
-    <color name="neon_violet">#9D00FF</color>
-    <color name="neon_violet_bright">#BF5FFF</color>
-    <color name="neon_violet_dim">#6A00CC</color>
-    <color name="neon_cyan">#00F5FF</color>
-    <color name="neon_cyan_dim">#00BBCC</color>
-    <color name="neon_magenta">#FF007A</color>
-    <color name="neon_pink">#FF4DC4</color>
-    <color name="neon_green">#00FF88</color>
-    <color name="neon_amber">#FFAA00</color>
+        <!-- Strictly Red Kingdom Palette - Brightened for Visibility -->
+    <color name="neon_violet">#FF0000</color> <!-- Pure Red -->
+    <color name="neon_violet_bright">#FF5252</color> <!-- Crimson -->
+    <color name="neon_violet_dim">#B71C1C</color> <!-- Dark Red -->
 
-    <!-- Dark Background Scale -->
-    <color name="bg_abyss">#020206</color>
-    <color name="bg_deep">#07070F</color>
-    <color name="bg_surface">#0E0E1C</color>
-    <color name="bg_card">#131325</color>
-    <color name="bg_elevated">#1A1A30</color>
+    <color name="neon_cyan">#FF1744</color> <!-- Red Accent -->
+    <color name="neon_cyan_dim">#D50000</color> <!-- Deep Red Accent -->
+    <color name="neon_magenta">#C62828</color> <!-- Blood Red -->
+    <color name="neon_pink">#FF8A80</color> <!-- Light Red -->
+    <color name="neon_green">#880E4F</color> <!-- Deep Maroon -->
+    <color name="neon_amber">#FF5252</color> <!-- Red -->
+
+    <!-- Crimson Dark Background Scale - More obviously Red -->
+    <color name="bg_abyss">#1A0000</color>
+    <color name="bg_deep">#250000</color>
+    <color name="bg_surface">#300000</color>
+    <color name="bg_card">#3A0000</color>
+    <color name="bg_elevated">#450000</color>
 
     <!-- Text -->
-    <color name="text_primary">#F0F0FF</color>
-    <color name="text_secondary">#9090B0</color>
-    <color name="text_hint">#505070</color>
+    <color name="text_primary">#FFFFFF</color> <!-- WHITE -->
+    <color name="text_secondary">#FFCDD2</color> <!-- Light Red -->
+    <color name="text_hint">#EF5350</color> <!-- Medium Red -->
     <color name="text_neon_purple">@color/neon_violet</color>
     <color name="text_neon_cyan">@color/neon_cyan</color>
     <color name="text_neon_magenta">@color/neon_magenta</color>
@@ -30,11 +31,12 @@
     <color name="border_neon_purple">@color/neon_violet</color>
     <color name="border_neon_cyan">@color/neon_cyan</color>
     <color name="border_neon_magenta">@color/neon_magenta</color>
-    <color name="border_subtle">#1E1E38</color>
-    <color name="divider_dark">#1A1A30</color>
-    <color name="divider_glow">#2A2A50</color>
+    <color name="border_subtle">#660000</color>
+    <color name="divider_dark">#2A0000</color>
+    <color name="divider_glow">#FF0000</color>
 
     <!-- Scrim / overlay -->
-    <color name="scrim_dark">#CC000000</color>
+    <color name="scrim_dark">#CC330000</color>
     <color name="transparent">#00000000</color>
+    <color name="white">#FFFFFF</color>
 </resources>

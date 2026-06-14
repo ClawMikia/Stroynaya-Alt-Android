@@ -65,7 +65,7 @@
         <item name="android:elevation">0dp</item>
         <item name="android:paddingTop">12dp</item>
         <item name="android:paddingBottom">12dp</item>
-        <item name="rippleColor">#33BF5FFF</item>
+        <item name="rippleColor">#33FF5252</item>
     </style>
 
     <!-- Filled neon violet button -->
@@ -94,7 +94,7 @@
     <!-- Danger text button -->
     <style name="Btn.Danger" parent="Widget.Material3.Button.TextButton">
         <item name="android:textColor">@color/neon_magenta</item>
-        <item name="rippleColor">#33FF007A</item>
+        <item name="rippleColor">#33D32F2F</item>
     </style>
 
     <!-- ══════════════════════════════════════════════════
@@ -130,6 +130,8 @@
         <item name="colorSurface">@color/bg_abyss</item>
         <item name="colorOnSurface">@color/text_hint</item>
         <item name="colorPrimary">@color/neon_violet</item>
+        <item name="colorPrimaryContainer">@color/neon_violet_dim</item>
+        <item name="colorOnPrimaryContainer">@color/white</item>
     </style>
 
     <!-- ══════════════════════════════════════════════════

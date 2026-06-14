@@ -77,7 +77,7 @@ class MediaLibraryAdapter(
             is GridVH -> {
                 holder.binding.thumbnail.load(file) { crossfade(300) }
                 holder.binding.title.text = item.displayName
-                holder.binding.subtitle.text = if (item.isVideo) "VIDEO" else "PHOTO"
+                holder.binding.subtitle.text = if (item.isVideo) "VISION" else "STILL"
                 holder.binding.root.alpha = if (selectionMode && !isSelected) 0.5f else 1.0f
                 holder.itemView.setOnClickListener {
                     if (selectionMode) {
@@ -92,7 +92,7 @@ class MediaLibraryAdapter(
                 holder.binding.title.text = item.displayName
                 val sizeKb = item.sizeBytes / 1024
                 holder.binding.subtitle.text =
-                    if (item.isVideo) "Video · $sizeKb KB" else "Photo · $sizeKb KB"
+                    if (item.isVideo) "Vision · $sizeKb KB" else "Still · $sizeKb KB"
                 holder.binding.root.alpha = if (selectionMode && !isSelected) 0.5f else 1.0f
                 holder.itemView.setOnClickListener {
                     if (selectionMode) {

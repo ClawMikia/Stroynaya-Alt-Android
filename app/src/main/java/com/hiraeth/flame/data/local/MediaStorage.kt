@@ -13,7 +13,7 @@ import java.util.UUID
  */
 class MediaStorage(private val context: Context) {
 
-    val root: File = File(context.filesDir, "hiraeth_media").also { it.mkdirs() }
+    val root: File = File(context.filesDir, "hiraeth_media_alt").also { it.mkdirs() }
 
     val imagesDir: File = File(root, "images").also { it.mkdirs() }
     val videosDir: File = File(root, "videos").also { it.mkdirs() }

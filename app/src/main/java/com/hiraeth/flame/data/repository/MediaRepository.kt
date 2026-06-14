@@ -18,6 +18,13 @@ class MediaRepository(
     private val storage: MediaStorage,
 ) {
 
+    private val fantasyPrefixes = listOf("Brave", "Dark", "Holy", "Ancient", "Cursed", "Mystic", "Royal", "Shadow", "Silver", "Golden", "Eternal", "Frozen", "Burning", "Silent", "Lost")
+    private val fantasyCharacters = listOf("Knight", "Mage", "Dragon", "Elf", "King", "Queen", "Warrior", "Spirit", "Ranger", "Slayer", "Paladin", "Oracle", "Hunter", "Lord", "Reaper")
+
+    fun generateFantasyName(): String {
+        return "${fantasyPrefixes.random()} ${fantasyCharacters.random()}"
+    }
+
     fun observeAll(): Flow<List<MediaEntity>> = dao.observeAll()
 
     fun observeById(id: Long): Flow<MediaEntity?> = dao.observeById(id)
@@ -39,7 +46,7 @@ class MediaRepository(
             val dims = if (isVideo) videoDimensionsAndDuration(file) else imageDimensions(file)
             val entity = MediaEntity(
                 relativePath = storage.relativeToRoot(file),
-                displayName = suggestedName.trim(),
+                displayName = generateFantasyName(), // Automatically name in 2 words
                 mimeType = mime,
                 isVideo = isVideo,
                 sizeBytes = file.length(),
@@ -51,19 +58,18 @@ class MediaRepository(
             dao.insert(entity)
         }
 
-    // ✅ FIXED: Takes both custom title and description strings passed from your camera UI capture workflow
     suspend fun registerCapturedPhoto(file: File, title: String, description: String): Long =
-        insertFileRecord(file, isVideo = false, title, description)
+        insertFileRecord(file, isVideo = false, generateFantasyName(), description)
 
     suspend fun registerCapturedVideo(file: File, title: String, description: String): Long =
-        insertFileRecord(file, isVideo = true, title, description)
+        insertFileRecord(file, isVideo = true, generateFantasyName(), description)
 
     suspend fun saveBitmapAsMedia(bitmap: Bitmap, title: String, description: String): Long = withContext(Dispatchers.IO) {
-        val file = File(storage.imagesDir, "COMBINED_${System.currentTimeMillis()}.jpg")
+        val file = File(storage.imagesDir, "STRO_COMBINED_${System.currentTimeMillis()}.jpg")
         FileOutputStream(file).use { out ->
             bitmap.compress(Bitmap.CompressFormat.JPEG, 90, out)
         }
-        insertFileRecord(file, isVideo = false, title, description)
+        insertFileRecord(file, isVideo = false, generateFantasyName(), description)
     }
 
     private suspend fun insertFileRecord(file: File, isVideo: Boolean, title: String, description: String): Long =
@@ -79,7 +85,7 @@ class MediaRepository(
                 width = dims.first,
                 height = dims.second,
                 durationMs = dims.third,
-                description = description.trim(), // ✅ Saves metadata cleanly to SQLite on device capture
+                description = description.trim(),
             )
             dao.insert(entity)
         }

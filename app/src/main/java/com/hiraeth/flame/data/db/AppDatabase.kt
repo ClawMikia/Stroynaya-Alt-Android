@@ -23,7 +23,7 @@ abstract class AppDatabase : RoomDatabase() {
                 instance ?: Room.databaseBuilder(
                     context.applicationContext,
                     AppDatabase::class.java,
-                    "hiraeth_flame.db",
+                    "hiraeth_flame_alt.db",
                 ).build().also { instance = it }
             }
     }
