@@ -91,9 +91,18 @@
         <item name="android:elevation">0dp</item>
     </style>
 
-    <!-- Danger text button -->
-    <style name="Btn.Danger" parent="Widget.Material3.Button.TextButton">
+    <!-- Danger outlined neon button -->
+    <style name="Btn.Danger" parent="Widget.Material3.Button">
         <item name="android:textColor">@color/neon_magenta</item>
+        <item name="backgroundTint">@android:color/transparent</item>
+        <item name="strokeColor">@color/neon_magenta</item>
+        <item name="strokeWidth">1.5dp</item>
+        <item name="cornerRadius">10dp</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:letterSpacing">0.05</item>
+        <item name="android:elevation">0dp</item>
+        <item name="android:paddingTop">12dp</item>
+        <item name="android:paddingBottom">12dp</item>
         <item name="rippleColor">#33D32F2F</item>
     </style>
 

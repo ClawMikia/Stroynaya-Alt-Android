@@ -62,12 +62,13 @@
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
-                    android:layout_marginEnd="8dp"
+                    android:layout_marginEnd="4dp"
                     android:text="Edit"
-                    android:textSize="11sp"
+                    android:textSize="10sp"
+                    android:maxLines="1"
                     app:icon="@drawable/ic_edit"
                     app:iconGravity="top"
-                    app:iconPadding="4dp"
+                    app:iconPadding="2dp"
                     app:iconTint="@color/neon_violet" />
 
                 <com.google.android.material.button.MaterialButton
@@ -76,12 +77,13 @@
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
-                    android:layout_marginEnd="8dp"
+                    android:layout_marginEnd="4dp"
                     android:text="Filter"
-                    android:textSize="11sp"
+                    android:textSize="9sp"
+                    android:maxLines="1"
                     app:icon="@drawable/ic_filter"
                     app:iconGravity="top"
-                    app:iconPadding="4dp"
+                    app:iconPadding="2dp"
                     app:iconTint="@color/neon_violet" />
 
                 <com.google.android.material.button.MaterialButton
@@ -90,12 +92,13 @@
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
-                    android:layout_marginEnd="8dp"
+                    android:layout_marginEnd="4dp"
                     android:text="Zip"
-                    android:textSize="11sp"
+                    android:textSize="10sp"
+                    android:maxLines="1"
                     app:icon="@android:drawable/ic_menu_save"
                     app:iconGravity="top"
-                    app:iconPadding="4dp"
+                    app:iconPadding="2dp"
                     app:iconTint="@color/neon_violet" />
 
                 <com.google.android.material.button.MaterialButton
@@ -104,12 +107,28 @@
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
+                    android:layout_marginEnd="4dp"
                     android:text="Add"
-                    android:textSize="11sp"
+                    android:textSize="10sp"
+                    android:maxLines="1"
                     app:icon="@android:drawable/ic_input_add"
                     app:iconGravity="top"
-                    app:iconPadding="4dp"
+                    app:iconPadding="2dp"
                     app:iconTint="@color/neon_violet" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_delete_album"
+                    style="@style/Btn.Danger"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:text="Del"
+                    android:textSize="9sp"
+                    android:maxLines="1"
+                    app:icon="@android:drawable/ic_menu_delete"
+                    app:iconGravity="top"
+                    app:iconPadding="2dp"
+                    app:iconTint="@color/neon_magenta" />
             </LinearLayout>
 
             <androidx.recyclerview.widget.RecyclerView

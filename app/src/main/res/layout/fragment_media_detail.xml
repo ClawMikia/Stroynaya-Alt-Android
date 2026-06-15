@@ -167,6 +167,15 @@
                     android:layout_height="52dp"
                     android:text="Delete from library" />
 
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_remove_album"
+                    style="@style/Btn.Danger"
+                    android:layout_width="match_parent"
+                    android:layout_height="52dp"
+                    android:layout_marginTop="8dp"
+                    android:text="Remove from album"
+                    android:visibility="gone" />
+
             </LinearLayout>
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>

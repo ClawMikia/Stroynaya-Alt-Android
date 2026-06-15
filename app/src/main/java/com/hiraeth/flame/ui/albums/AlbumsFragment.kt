@@ -56,41 +56,19 @@ class AlbumsFragment : Fragment() {
         )
         binding.toolbar.setupWithNavController(navController, appBarConfig)
 
-        binding.fabNewAlbum.setOnClickListener { showCreateAlbumDialog() }
+        binding.fabNewAlbum.setOnClickListener { 
+            (activity as? com.hiraeth.flame.MainActivity)?.showCreateAlbumDialog()
+        }
+
+        binding.fabImportFolder.setOnClickListener {
+            (activity as? com.hiraeth.flame.MainActivity)?.importFolderAsAlbum()
+        }
 
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.albums.collect { adapter.submitList(it) }
             }
         }
-    }
-
-    private fun showCreateAlbumDialog() {
-        val dialogView = LayoutInflater.from(requireContext())
-            .inflate(R.layout.dialog_new_album, null)
-        val inputName = dialogView.findViewById<com.google.android.material.textfield.TextInputEditText>(
-            R.id.album_name_input,
-        )
-        val inputDesc = dialogView.findViewById<com.google.android.material.textfield.TextInputEditText>(
-            R.id.description_input,
-        )
-        val btnCancel = dialogView.findViewById<View>(R.id.btn_cancel)
-        val btnCreate = dialogView.findViewById<View>(R.id.btn_create)
-
-        val dialog = MaterialAlertDialogBuilder(requireContext(), R.style.Dialog_Neon)
-            .setView(dialogView)
-            .create()
-
-        btnCancel.setOnClickListener { dialog.dismiss() }
-        btnCreate.setOnClickListener {
-            val name = inputName.text?.toString().orEmpty().trim()
-            val desc = inputDesc.text?.toString().orEmpty().trim()
-            if (name.isNotBlank()) {
-                viewModel.createAlbum(name, desc)
-                dialog.dismiss()
-            }
-        }
-        dialog.show()
     }
 
     override fun onDestroyView() {

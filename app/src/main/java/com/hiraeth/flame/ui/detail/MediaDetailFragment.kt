@@ -117,6 +117,10 @@ class MediaDetailFragment : Fragment() {
             showDeleteConfirmation()
         }
 
+        binding.btnRemoveAlbum.setOnClickListener {
+            showRemoveFromAlbumConfirmation()
+        }
+
         binding.btnPrev.setOnClickListener { 
             binding.viewPager.currentItem -= 1
         }
@@ -131,6 +135,8 @@ class MediaDetailFragment : Fragment() {
                     .show(parentFragmentManager, "fullscreen_media")
             }
         }
+
+        binding.btnRemoveAlbum.visibility = if (albumId != -1L) View.VISIBLE else View.GONE
 
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -189,6 +195,17 @@ class MediaDetailFragment : Fragment() {
             .setNegativeButton(R.string.action_cancel, null)
             .setPositiveButton(R.string.action_delete) { _, _ ->
                 viewModel.delete { findNavController().popBackStack() }
+            }
+            .show()
+    }
+
+    private fun showRemoveFromAlbumConfirmation() {
+        MaterialAlertDialogBuilder(requireContext(), R.style.Dialog_Neon)
+            .setTitle("Remove from Album")
+            .setMessage("Are you sure you want to remove this item from the album? It will remain in your library.")
+            .setNegativeButton("Cancel", null)
+            .setPositiveButton("Remove") { _, _ ->
+                viewModel.removeFromAlbum { findNavController().popBackStack() }
             }
             .show()
     }

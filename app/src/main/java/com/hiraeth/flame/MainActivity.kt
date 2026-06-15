@@ -21,10 +21,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-/**
- * Single-activity host: [NavHostFragment] + bottom navigation.
- * Edge-to-edge is enabled; system bars handled via WindowInsets.
- */
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
@@ -33,10 +29,14 @@ class MainActivity : AppCompatActivity() {
 
     private val permissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions(),
-    ) { /* fragments re-check permissions in onResume */ }
+    ) { }
 
     private val importFolderLauncher = registerForActivityResult(ActivityResultContracts.OpenDocumentTree()) { uri ->
         uri?.let { handleFolderImport(it) }
+    }
+
+    private val importFolderAsAlbumLauncher = registerForActivityResult(ActivityResultContracts.OpenDocumentTree()) { uri ->
+        uri?.let { handleFolderAsAlbumImport(it) }
     }
 
     private val importMultipleLauncher = registerForActivityResult(ActivityResultContracts.GetMultipleContents()) { uris ->
@@ -48,13 +48,11 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // Edge-to-edge
         WindowCompat.setDecorFitsSystemWindows(window, false)
 
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // Apply bottom inset to the BottomNavigationView so it sits above the navigation bar
         ViewCompat.setOnApplyWindowInsetsListener(binding.bottomNav) { view, insets ->
             val navBar = insets.getInsets(WindowInsetsCompat.Type.navigationBars())
             view.updatePadding(bottom = navBar.bottom)
@@ -75,10 +73,16 @@ class MainActivity : AppCompatActivity() {
             val isTopLevel = destination.id in topLevel
             binding.bottomNav.isVisible = isTopLevel
             binding.fabImport.isVisible = isTopLevel
-        }
 
-        binding.fabImport.setOnClickListener {
-            showImportOptions()
+            if (destination.id == R.id.libraryFragment) {
+                binding.fabImport.setOnClickListener {
+                    showCreateAlbumDialog()
+                }
+            } else {
+                binding.fabImport.setOnClickListener {
+                    showImportOptions()
+                }
+            }
         }
 
         requestAppPermissions()
@@ -95,6 +99,118 @@ class MainActivity : AppCompatActivity() {
                 }
             }
             .show()
+    }
+
+    fun showCreateAlbumDialog() {
+        val dialogView = layoutInflater.inflate(R.layout.dialog_new_album, null)
+        val inputName = dialogView.findViewById<com.google.android.material.textfield.TextInputEditText>(R.id.album_name_input)
+        val inputDesc = dialogView.findViewById<com.google.android.material.textfield.TextInputEditText>(R.id.description_input)
+        val btnCancel = dialogView.findViewById<android.view.View>(R.id.btn_cancel)
+        val btnCreate = dialogView.findViewById<android.view.View>(R.id.btn_create)
+
+        val dialog = MaterialAlertDialogBuilder(this, R.style.Dialog_Neon)
+            .setView(dialogView)
+            .create()
+
+        btnCancel.setOnClickListener { dialog.dismiss() }
+        btnCreate.setOnClickListener {
+            val name = inputName.text?.toString().orEmpty().trim()
+            val desc = inputDesc.text?.toString().orEmpty().trim()
+            if (name.isNotBlank()) {
+                lifecycleScope.launch {
+                    container.albumRepository.createAlbum(name, desc)
+                    Toast.makeText(this@MainActivity, "Album created!", Toast.LENGTH_SHORT).show()
+                    dialog.dismiss()
+                    
+                    val navHost = supportFragmentManager.findFragmentById(R.id.nav_host) as NavHostFragment
+                    navHost.navController.navigate(R.id.albumsFragment)
+                }
+            }
+        }
+        dialog.show()
+    }
+
+    fun importFolderAsAlbum() {
+        importFolderAsAlbumLauncher.launch(null)
+    }
+
+    private fun handleFolderAsAlbumImport(treeUri: Uri) {
+        val documentUri = DocumentsContract.buildDocumentUriUsingTree(
+            treeUri,
+            DocumentsContract.getTreeDocumentId(treeUri)
+        )
+
+        var folderName = "New Album"
+        contentResolver.query(documentUri, arrayOf(DocumentsContract.Document.COLUMN_DISPLAY_NAME), null, null, null)?.use { cursor ->
+            if (cursor.moveToFirst()) {
+                folderName = cursor.getString(0)
+            }
+        }
+
+        lifecycleScope.launch(Dispatchers.IO) {
+            val albumId = container.albumRepository.createAlbum(folderName, "Imported from folder $folderName")
+
+            val childrenUri = DocumentsContract.buildChildDocumentsUriUsingTree(
+                treeUri,
+                DocumentsContract.getTreeDocumentId(treeUri),
+            )
+
+            val childProjection = arrayOf(
+                DocumentsContract.Document.COLUMN_DOCUMENT_ID,
+                DocumentsContract.Document.COLUMN_MIME_TYPE,
+                DocumentsContract.Document.COLUMN_DISPLAY_NAME,
+            )
+
+            contentResolver.query(childrenUri, childProjection, null, null, null)?.use { cursor ->
+                val idIdx = cursor.getColumnIndexOrThrow(DocumentsContract.Document.COLUMN_DOCUMENT_ID)
+                val mimeIdx = cursor.getColumnIndexOrThrow(DocumentsContract.Document.COLUMN_MIME_TYPE)
+                val nameIdx = cursor.getColumnIndexOrThrow(DocumentsContract.Document.COLUMN_DISPLAY_NAME)
+
+                val itemsToImport = mutableListOf<Triple<Uri, String, Boolean>>()
+
+                while (cursor.moveToNext()) {
+                    val docId = cursor.getString(idIdx)
+                    val mime = cursor.getString(mimeIdx)
+                    val name = cursor.getString(nameIdx)
+
+                    if (mime != null && (mime.startsWith("image/") || mime.startsWith("video/"))) {
+                        val isVideo = mime.startsWith("video/")
+                        val uri = DocumentsContract.buildDocumentUriUsingTree(treeUri, docId)
+                        itemsToImport.add(Triple(uri, name, isVideo))
+                    }
+                }
+
+                if (itemsToImport.isNotEmpty()) {
+                    withContext(Dispatchers.Main) {
+                        Toast.makeText(this@MainActivity, "Importing ${itemsToImport.size} items to '$folderName'...", Toast.LENGTH_SHORT).show()
+                    }
+
+                    itemsToImport.forEach { (uri, name, isVideo) ->
+                        try {
+                            val mediaId = container.mediaRepository.importFromUri(
+                                uri = uri,
+                                suggestedName = name,
+                                description = "Imported to album $folderName",
+                                isVideo = isVideo,
+                            )
+                            container.albumRepository.addToAlbum(albumId, mediaId)
+                        } catch (e: Exception) {
+                            e.printStackTrace()
+                        }
+                    }
+
+                    withContext(Dispatchers.Main) {
+                        Toast.makeText(this@MainActivity, "Album '$folderName' imported complete!", Toast.LENGTH_SHORT).show()
+                        val navHost = supportFragmentManager.findFragmentById(R.id.nav_host) as NavHostFragment
+                        navHost.navController.navigate(R.id.albumsFragment)
+                    }
+                } else {
+                    withContext(Dispatchers.Main) {
+                        Toast.makeText(this@MainActivity, "No media found in folder", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
+        }
     }
 
     private fun handleFolderImport(treeUri: Uri) {
@@ -166,7 +282,6 @@ class MainActivity : AppCompatActivity() {
             uris.forEach { uri ->
                 try {
                     val name = uri.lastPathSegment ?: "Imported Image"
-                    // GetMultipleContents filtered by image/* so isVideo=false
                     container.mediaRepository.importFromUri(
                         uri = uri,
                         suggestedName = name,
