@@ -44,6 +44,17 @@ class AlbumDetailViewModel(
         else media.filter { it.displayName.contains(query, ignoreCase = true) || it.description.contains(query, ignoreCase = true) }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
+    val allMedia: StateFlow<List<MediaEntity>> = mediaRepository.observeAll()
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
+
+    fun addToAlbum(mediaIds: List<Long>) {
+        viewModelScope.launch {
+            mediaIds.forEach { mediaId ->
+                albumRepository.addToAlbum(albumId, mediaId)
+            }
+        }
+    }
+
     fun setFilter(query: String) {
         _filter.value = query
     }

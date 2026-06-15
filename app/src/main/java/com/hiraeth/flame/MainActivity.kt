@@ -72,11 +72,13 @@ class MainActivity : AppCompatActivity() {
         navController.addOnDestinationChangedListener { _, destination, _ ->
             val isTopLevel = destination.id in topLevel
             binding.bottomNav.isVisible = isTopLevel
-            binding.fabImport.isVisible = isTopLevel
+            
+            // AlbumsFragment has its own multi-FAB setup, so hide activity FAB there
+            binding.fabImport.isVisible = isTopLevel && destination.id != R.id.albumsFragment
 
             if (destination.id == R.id.libraryFragment) {
                 binding.fabImport.setOnClickListener {
-                    showCreateAlbumDialog()
+                    showImportOptions()
                 }
             } else {
                 binding.fabImport.setOnClickListener {
@@ -134,7 +136,25 @@ class MainActivity : AppCompatActivity() {
         importFolderAsAlbumLauncher.launch(null)
     }
 
+    fun showLoading(text: String = "Importing...") {
+        binding.loadingOverlay.isVisible = true
+        binding.loadingText.text = text
+        val drawable = binding.loadingIcon.drawable
+        if (drawable is android.graphics.drawable.Animatable) {
+            drawable.start()
+        }
+    }
+
+    fun hideLoading() {
+        binding.loadingOverlay.isVisible = false
+        val drawable = binding.loadingIcon.drawable
+        if (drawable is android.graphics.drawable.Animatable) {
+            drawable.stop()
+        }
+    }
+
     private fun handleFolderAsAlbumImport(treeUri: Uri) {
+        showLoading("Importing Album...")
         val documentUri = DocumentsContract.buildDocumentUriUsingTree(
             treeUri,
             DocumentsContract.getTreeDocumentId(treeUri)
@@ -200,12 +220,14 @@ class MainActivity : AppCompatActivity() {
                     }
 
                     withContext(Dispatchers.Main) {
+                        hideLoading()
                         Toast.makeText(this@MainActivity, "Album '$folderName' imported complete!", Toast.LENGTH_SHORT).show()
                         val navHost = supportFragmentManager.findFragmentById(R.id.nav_host) as NavHostFragment
                         navHost.navController.navigate(R.id.albumsFragment)
                     }
                 } else {
                     withContext(Dispatchers.Main) {
+                        hideLoading()
                         Toast.makeText(this@MainActivity, "No media found in folder", Toast.LENGTH_SHORT).show()
                     }
                 }
@@ -214,6 +236,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun handleFolderImport(treeUri: Uri) {
+        showLoading("Importing Images...")
         val childrenUri = DocumentsContract.buildChildDocumentsUriUsingTree(
             treeUri,
             DocumentsContract.getTreeDocumentId(treeUri),
@@ -263,10 +286,12 @@ class MainActivity : AppCompatActivity() {
                     }
 
                     withContext(Dispatchers.Main) {
+                        hideLoading()
                         Toast.makeText(this@MainActivity, "Folder import complete!", Toast.LENGTH_SHORT).show()
                     }
                 } else {
                     withContext(Dispatchers.Main) {
+                        hideLoading()
                         Toast.makeText(this@MainActivity, "No images found in folder", Toast.LENGTH_SHORT).show()
                     }
                 }
@@ -275,6 +300,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun handleMultipleFilesImport(uris: List<Uri>) {
+        showLoading("Importing Media...")
         lifecycleScope.launch(Dispatchers.IO) {
             withContext(Dispatchers.Main) {
                 Toast.makeText(this@MainActivity, "Importing ${uris.size} items...", Toast.LENGTH_SHORT).show()
@@ -293,6 +319,7 @@ class MainActivity : AppCompatActivity() {
                 }
             }
             withContext(Dispatchers.Main) {
+                hideLoading()
                 Toast.makeText(this@MainActivity, "Import complete!", Toast.LENGTH_SHORT).show()
             }
         }

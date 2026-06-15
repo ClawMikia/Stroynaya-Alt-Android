@@ -44,17 +44,18 @@ class LibraryFragment : Fragment() {
     private val container get() = (requireActivity().application as com.hiraeth.flame.HiraethApplication).container
 
     private val viewModel: LibraryViewModel by viewModels {
-        LibraryViewModel.factory(container.mediaRepository)
+        LibraryViewModel.factory(container.mediaRepository, container.albumRepository)
     }
 
-    private lateinit var adapter: MediaLibraryAdapter
+    private lateinit var adapter: GroupedLibraryAdapter
 
     private var targetCombineCount = 0
 
     private val quickImportLauncher = registerForActivityResult(ActivityResultContracts.GetMultipleContents()) { uris ->
         if (uris.isNotEmpty()) {
+            val activity = activity as? com.hiraeth.flame.MainActivity
+            activity?.showLoading("Importing ${uris.size} items...")
             viewLifecycleOwner.lifecycleScope.launch {
-                Toast.makeText(requireContext(), "Importing ${uris.size} items...", Toast.LENGTH_SHORT).show()
                 withContext(Dispatchers.IO) {
                     uris.forEach { uri ->
                         try {
@@ -67,6 +68,7 @@ class LibraryFragment : Fragment() {
                         }
                     }
                 }
+                activity?.hideLoading()
                 Toast.makeText(requireContext(), "Import complete!", Toast.LENGTH_SHORT).show()
             }
         }
@@ -78,7 +80,7 @@ class LibraryFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        adapter = MediaLibraryAdapter(
+        adapter = GroupedLibraryAdapter(
             container = container,
             gridMode = viewModel.viewModeState.value == LibraryViewMode.Grid,
             onItemClick = { id ->
@@ -87,6 +89,12 @@ class LibraryFragment : Fragment() {
                     putLong("albumId", -1L)
                 }
                 findNavController().navigate(R.id.action_library_to_detail, b)
+            },
+            onItemLongClick = { id ->
+                startDeletionSelection()
+            },
+            onHeaderClick = { headerId ->
+                viewModel.toggleHeader(headerId)
             }
         )
         binding.recycler.adapter = adapter
@@ -138,6 +146,14 @@ class LibraryFragment : Fragment() {
                     showCombineDialog()
                     true
                 }
+                R.id.action_delete_selected -> {
+                    showMultiDeleteConfirm()
+                    true
+                }
+                R.id.action_cancel_selection -> {
+                    exitSelectionMode()
+                    true
+                }
                 else -> false
             }
         }
@@ -145,7 +161,7 @@ class LibraryFragment : Fragment() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 launch {
-                    viewModel.items.collect { adapter.submitList(it) }
+                    viewModel.groupedItems.collect { adapter.submitList(it) }
                 }
                 launch {
                     viewModel.viewModeState.collect { mode ->
@@ -270,12 +286,55 @@ class LibraryFragment : Fragment() {
         }
     }
 
+    private fun startDeletionSelection() {
+        binding.toolbar.menu.findItem(R.id.action_delete_selected)?.isVisible = true
+        binding.toolbar.menu.findItem(R.id.action_cancel_selection)?.isVisible = true
+        binding.toolbar.menu.findItem(R.id.action_combine)?.isVisible = false
+        binding.toolbar.menu.findItem(R.id.action_toggle_view)?.isVisible = false
+        adapter.enterSelectionMode { count ->
+            binding.toolbar.title = "Selected: $count"
+        }
+    }
+
+    private fun showMultiDeleteConfirm() {
+        val selected = adapter.getSelectedItems()
+        if (selected.isEmpty()) return
+
+        MaterialAlertDialogBuilder(requireContext(), R.style.Dialog_Neon)
+            .setTitle("Delete Media")
+            .setMessage("Are you sure you want to delete ${selected.size} items from the library?")
+            .setPositiveButton("Delete") { _, _ ->
+                viewLifecycleOwner.lifecycleScope.launch {
+                    selected.forEach { viewModel.delete(it) }
+                    exitSelectionMode()
+                    Toast.makeText(requireContext(), "Deleted ${selected.size} items", Toast.LENGTH_SHORT).show()
+                }
+            }
+            .setNegativeButton("Cancel", null)
+            .show()
+    }
+
+    private fun exitSelectionMode() {
+        adapter.exitSelectionMode()
+        binding.toolbar.menu.findItem(R.id.action_delete_selected)?.isVisible = false
+        binding.toolbar.menu.findItem(R.id.action_cancel_selection)?.isVisible = false
+        binding.toolbar.menu.findItem(R.id.action_combine)?.isVisible = true
+        binding.toolbar.menu.findItem(R.id.action_toggle_view)?.isVisible = true
+        binding.toolbar.title = getString(R.string.app_name)
+    }
+
     private fun applyLayoutManager() {
         val grid = viewModel.viewModeState.value == LibraryViewMode.Grid
-        binding.recycler.layoutManager = if (grid) {
-            GridLayoutManager(requireContext(), 3)
+        if (grid) {
+            val glm = GridLayoutManager(requireContext(), 3)
+            glm.spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
+                override fun getSpanSize(position: Int): Int {
+                    return if (adapter.getItemViewType(position) == 0) 3 else 1 // 0 is TYPE_HEADER
+                }
+            }
+            binding.recycler.layoutManager = glm
         } else {
-            LinearLayoutManager(requireContext())
+            binding.recycler.layoutManager = LinearLayoutManager(requireContext())
         }
     }
 

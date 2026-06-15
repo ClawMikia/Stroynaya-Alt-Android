@@ -20,7 +20,7 @@ class AlbumRepository(
 
     suspend fun updateAlbum(id: Long, name: String, description: String) {
         val album = AlbumEntity(id = id, name = name.trim(), description = description.trim())
-        albumDao.insertAlbum(album)
+        albumDao.updateAlbum(album)
     }
 
     suspend fun addToAlbum(albumId: Long, mediaId: Long) {

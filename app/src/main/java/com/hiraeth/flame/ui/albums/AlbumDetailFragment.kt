@@ -19,7 +19,6 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.hiraeth.flame.R
 import com.hiraeth.flame.databinding.FragmentAlbumDetailBinding
 import com.hiraeth.flame.ui.library.MediaLibraryAdapter
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -45,28 +44,6 @@ class AlbumDetailFragment : Fragment() {
                 } else {
                     Toast.makeText(requireContext(), "Export failed", Toast.LENGTH_SHORT).show()
                 }
-            }
-        }
-    }
-
-    private val addFromDeviceLauncher = registerForActivityResult(ActivityResultContracts.GetMultipleContents()) { uris ->
-        if (uris.isNotEmpty()) {
-            viewLifecycleOwner.lifecycleScope.launch {
-                Toast.makeText(requireContext(), "Adding ${uris.size} items to album...", Toast.LENGTH_SHORT).show()
-                withContext(Dispatchers.IO) {
-                    uris.forEach { uri ->
-                        try {
-                            val type = requireContext().contentResolver.getType(uri).orEmpty()
-                            val isVideo = type.startsWith("video/")
-                            val name = uri.lastPathSegment ?: "Imported Media"
-                            val mediaId = container.mediaRepository.importFromUri(uri, name, "Added to album from device", isVideo)
-                            container.albumRepository.addToAlbum(albumId, mediaId)
-                        } catch (e: Exception) {
-                            e.printStackTrace()
-                        }
-                    }
-                }
-                Toast.makeText(requireContext(), "Import to album complete!", Toast.LENGTH_SHORT).show()
             }
         }
     }
@@ -97,7 +74,7 @@ class AlbumDetailFragment : Fragment() {
             createZipLauncher.launch("${albumName.replace(" ", "_")}.zip")
         }
         binding.btnAddDevice.setOnClickListener {
-            addFromDeviceLauncher.launch("*/*")
+            showAddMediaDialog()
         }
         binding.btnDeleteAlbum.setOnClickListener {
             showDeleteAlbumConfirm()
@@ -216,6 +193,42 @@ class AlbumDetailFragment : Fragment() {
             }
             .setNegativeButton("Cancel", null)
             .show()
+    }
+
+    private fun showAddMediaDialog() {
+        val dialogView = LayoutInflater.from(requireContext()).inflate(R.layout.dialog_add_to_album, null)
+        val recycler = dialogView.findViewById<androidx.recyclerview.widget.RecyclerView>(R.id.recycler_selection)
+        val btnAdd = dialogView.findViewById<com.google.android.material.button.MaterialButton>(R.id.btn_add)
+        val btnCancel = dialogView.findViewById<View>(R.id.btn_cancel)
+
+        val selectionAdapter = MediaLibraryAdapter(container, gridMode = true) { _ -> }
+        recycler.layoutManager = GridLayoutManager(requireContext(), 3)
+        recycler.adapter = selectionAdapter
+
+        selectionAdapter.enterSelectionMode { count ->
+            btnAdd.text = "Add ($count)"
+            btnAdd.isEnabled = count > 0
+        }
+        btnAdd.isEnabled = false
+
+        val dialog = MaterialAlertDialogBuilder(requireContext(), R.style.Dialog_Neon)
+            .setView(dialogView)
+            .create()
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.allMedia.collect { list ->
+                selectionAdapter.submitList(list)
+            }
+        }
+
+        btnCancel.setOnClickListener { dialog.dismiss() }
+        btnAdd.setOnClickListener {
+            val selected = selectionAdapter.getSelectedItems().map { it.id }
+            viewModel.addToAlbum(selected)
+            dialog.dismiss()
+        }
+
+        dialog.show()
     }
 
     private fun findFirstTextView(viewGroup: ViewGroup): TextView? {

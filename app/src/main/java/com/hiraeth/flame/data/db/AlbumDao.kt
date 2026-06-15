@@ -19,6 +19,9 @@ interface AlbumDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAlbum(album: AlbumEntity): Long
 
+    @androidx.room.Update
+    suspend fun updateAlbum(album: AlbumEntity)
+
     @Transaction
     @Query("SELECT * FROM albums WHERE id = :id")
     fun observeAlbumWithMedia(id: Long): Flow<AlbumWithMedia?>

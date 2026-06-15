@@ -57,6 +57,7 @@ class MediaDetailFragment : Fragment() {
         // Setup ViewPager2 with smooth "soft" transitions
         pagerAdapter = MediaPagerAdapter(container)
         binding.viewPager.adapter = pagerAdapter
+        binding.viewPager.isUserInputEnabled = true // Ensure slidable
         
         val transformer = CompositePageTransformer().apply {
             addTransformer(MarginPageTransformer(40))
@@ -68,14 +69,14 @@ class MediaDetailFragment : Fragment() {
         }
         binding.viewPager.setPageTransformer(transformer)
         
-        // Prevent NestedScrollView from intercepting horizontal swipes when touching the media area
-        (binding.viewPager.getChildAt(0) as? androidx.recyclerview.widget.RecyclerView)?.let { rv ->
-            rv.setOnTouchListener { v, _ ->
-                v.parent.requestDisallowInterceptTouchEvent(true)
-                false
+        // Ensure ViewPager2 takes priority over NestedScrollView for horizontal swipes
+        binding.viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
+            override fun onPageScrollStateChanged(state: Int) {
+                // Disable NestedScrollView scrolling while ViewPager2 is swiping
+                binding.nestedScrollView.isNestedScrollingEnabled = (state == ViewPager2.SCROLL_STATE_IDLE)
             }
-        }
-        
+        })
+
         // Sync Pager -> ViewModel
         binding.viewPager.registerOnPageChangeCallback(
             object : ViewPager2.OnPageChangeCallback() {
