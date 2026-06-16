@@ -13,9 +13,6 @@ interface AlbumDao {
     @Query("SELECT * FROM albums ORDER BY name COLLATE NOCASE ASC")
     fun observeAlbumsWithMedia(): Flow<List<AlbumWithMedia>>
 
-    @Query("SELECT * FROM albums WHERE id = :id")
-    suspend fun getAlbum(id: Long): AlbumEntity?
-
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAlbum(album: AlbumEntity): Long
 

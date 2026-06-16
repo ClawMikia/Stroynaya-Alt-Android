@@ -13,7 +13,6 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupWithNavController
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.hiraeth.flame.R
 import com.hiraeth.flame.databinding.FragmentAlbumsBinding
 import kotlinx.coroutines.launch
@@ -42,11 +41,10 @@ class AlbumsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         adapter = AlbumsAdapter(
             container = container,
-            onAlbumClick = { id ->
-                val b = Bundle().apply { putLong("albumId", id) }
-                findNavController().navigate(R.id.action_albums_to_albumDetail, b)
-            }
-        )
+        ) { id ->
+            val b = Bundle().apply { putLong("albumId", id) }
+            findNavController().navigate(R.id.action_albums_to_albumDetail, b)
+        }
         binding.recycler.layoutManager = LinearLayoutManager(requireContext())
         binding.recycler.adapter = adapter
 

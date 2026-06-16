@@ -17,7 +17,7 @@ import java.io.FileOutputStream
 class ImageEditorViewModel(
     private val repository: MediaRepository,
     private val storage: MediaStorage,
-    private val mediaId: Long
+    private val mediaId: Long,
 ) : ViewModel() {
 
     private val _media = MutableStateFlow<MediaEntity?>(null)
@@ -61,8 +61,12 @@ class ImageEditorViewModel(
 
     companion object {
         fun factory(repository: MediaRepository, storage: MediaStorage, mediaId: Long) = object : ViewModelProvider.Factory {
+            @Suppress("UNCHECKED_CAST")
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                return ImageEditorViewModel(repository, storage, mediaId) as T
+                if (modelClass.isAssignableFrom(ImageEditorViewModel::class.java)) {
+                    return ImageEditorViewModel(repository, storage, mediaId) as T
+                }
+                throw IllegalArgumentException("Unknown ViewModel class")
             }
         }
     }

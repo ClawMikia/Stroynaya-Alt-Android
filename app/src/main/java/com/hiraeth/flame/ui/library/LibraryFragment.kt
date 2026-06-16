@@ -30,7 +30,6 @@ import com.hiraeth.flame.R
 import com.hiraeth.flame.databinding.FragmentLibraryBinding
 import com.hiraeth.flame.domain.LibrarySort
 import com.hiraeth.flame.domain.LibraryViewMode
-import com.hiraeth.flame.domain.MediaTypeFilter
 import com.hiraeth.flame.ui.util.AppPermissions
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -51,29 +50,6 @@ class LibraryFragment : Fragment() {
 
     private var targetCombineCount = 0
 
-    private val quickImportLauncher = registerForActivityResult(ActivityResultContracts.GetMultipleContents()) { uris ->
-        if (uris.isNotEmpty()) {
-            val activity = activity as? com.hiraeth.flame.MainActivity
-            activity?.showLoading("Importing ${uris.size} items...")
-            viewLifecycleOwner.lifecycleScope.launch {
-                withContext(Dispatchers.IO) {
-                    uris.forEach { uri ->
-                        try {
-                            val type = requireContext().contentResolver.getType(uri).orEmpty()
-                            val isVideo = type.startsWith("video/")
-                            val name = uri.lastPathSegment ?: "Imported Media"
-                            container.mediaRepository.importFromUri(uri, name, "Imported from device", isVideo)
-                        } catch (e: Exception) {
-                            e.printStackTrace()
-                        }
-                    }
-                }
-                activity?.hideLoading()
-                Toast.makeText(requireContext(), "Import complete!", Toast.LENGTH_SHORT).show()
-            }
-        }
-    }
-
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         _binding = FragmentLibraryBinding.inflate(inflater, container, false)
         return binding.root
@@ -90,12 +66,12 @@ class LibraryFragment : Fragment() {
                 }
                 findNavController().navigate(R.id.action_library_to_detail, b)
             },
-            onItemLongClick = { id ->
+            onItemLongClick = { _ ->
                 startDeletionSelection()
             },
             onHeaderClick = { headerId ->
                 viewModel.toggleHeader(headerId)
-            }
+            },
         )
         binding.recycler.adapter = adapter
         applyLayoutManager()
@@ -236,9 +212,8 @@ class LibraryFragment : Fragment() {
                     val cellHeight = bitmaps.maxOf { it.height }
                     
                     val totalWidth = cellWidth * n
-                    val totalHeight = cellHeight
                     
-                    val result = Bitmap.createBitmap(totalWidth, totalHeight, Bitmap.Config.ARGB_8888)
+                    val result = Bitmap.createBitmap(totalWidth, cellHeight, Bitmap.Config.ARGB_8888)
                     val canvas = Canvas(result)
                     canvas.drawColor(android.graphics.Color.BLACK)
 
@@ -252,7 +227,7 @@ class LibraryFragment : Fragment() {
                         var dx = 0f
                         var dy = 0f
 
-                        if (b.width * cellHeight > cellWidth * b.height) {
+                        if ((b.width * cellHeight > cellWidth * b.height)) {
                             scale = cellHeight.toFloat() / b.height.toFloat()
                             dx = (cellWidth - b.width * scale) * 0.5f
                         } else {

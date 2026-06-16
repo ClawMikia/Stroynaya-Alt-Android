@@ -94,12 +94,18 @@ class CameraFragment : Fragment() {
                         detailsDialog.setListeners(
                             onSaved = { typedTitle, typedDescription ->
                                 viewLifecycleOwner.lifecycleScope.launch {
-                                    try {
-                                        val newMediaId = container.mediaRepository.registerCapturedPhoto(
+                                    val newMediaId = try {
+                                        container.mediaRepository.registerCapturedPhoto(
                                             file,
                                             typedTitle,
-                                            typedDescription
+                                            typedDescription,
                                         )
+                                    } catch (e: Exception) {
+                                        Toast.makeText(requireContext(), "Capture failed: ${e.localizedMessage}", Toast.LENGTH_LONG).show()
+                                        null
+                                    }
+
+                                    if (newMediaId != null) {
                                         Toast.makeText(requireContext(), "Saved to Kingdom!", Toast.LENGTH_SHORT).show()
 
                                         findNavController().navigate(
@@ -109,16 +115,13 @@ class CameraFragment : Fragment() {
                                                 "albumId" to -1L
                                             )
                                         )
-                                    } catch (e: Exception) {
-                                        Toast.makeText(requireContext(), "Capture failed: ${e.localizedMessage}", Toast.LENGTH_LONG).show()
                                     }
                                 }
-                            },
-                            onCancelled = {
-                                if (file.exists()) file.delete()
-                                Toast.makeText(requireContext(), "Capture discarded", Toast.LENGTH_SHORT).show()
                             }
-                        )
+                        ) {
+                            if (file.exists()) file.delete()
+                            Toast.makeText(requireContext(), "Capture discarded", Toast.LENGTH_SHORT).show()
+                        }
                         detailsDialog.show(childFragmentManager, "capture_details_entry")
                     }
                 },

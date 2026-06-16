@@ -53,9 +53,9 @@ class MediaDetailViewModel(
                     current.copy(
                         displayName = title.trim(),
                         description = description.trim(),
-                    )
+                    ),
                 )
-            } catch (e: Exception) {
+            } catch (_: Exception) {
             }
         }
     }
@@ -70,7 +70,7 @@ class MediaDetailViewModel(
                 repository.getById(idToDelete)?.let { repository.delete(it) }
 
                 if (ids.size > 1) {
-                    if (currentIndex < ids.size - 1) {
+                    if ((currentIndex < ids.size - 1)) {
                         _currentId.value = ids[currentIndex + 1]
                     } else {
                         _currentId.value = ids[currentIndex - 1]
@@ -78,7 +78,7 @@ class MediaDetailViewModel(
                 } else {
                     onDone()
                 }
-            } catch (e: Exception) {
+            } catch (_: Exception) {
             }
         }
     }
@@ -87,7 +87,7 @@ class MediaDetailViewModel(
         viewModelScope.launch {
             try {
                 albumRepository.addToAlbum(targetAlbumId, _currentId.value)
-            } catch (e: Exception) {
+            } catch (_: Exception) {
             }
         }
     }
@@ -103,7 +103,7 @@ class MediaDetailViewModel(
                 albumRepository.removeFromAlbum(albumId, idToRemove)
 
                 if (ids.size > 1) {
-                    if (currentIndex < ids.size - 1) {
+                    if ((currentIndex < ids.size - 1)) {
                         _currentId.value = ids[currentIndex + 1]
                     } else {
                         _currentId.value = ids[currentIndex - 1]
@@ -111,7 +111,7 @@ class MediaDetailViewModel(
                 } else {
                     onDone()
                 }
-            } catch (e: Exception) {
+            } catch (_: Exception) {
             }
         }
     }

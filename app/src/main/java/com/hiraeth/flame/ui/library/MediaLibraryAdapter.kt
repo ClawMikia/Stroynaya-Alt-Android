@@ -31,24 +31,10 @@ class MediaLibraryAdapter(
         }
     }
 
-    fun setGridMode(grid: Boolean) {
-        if (gridMode != grid) {
-            gridMode = grid
-            notifyDataSetChanged()
-        }
-    }
-
     fun enterSelectionMode(listener: (Int) -> Unit) {
         selectionMode = true
         selectedIds.clear()
         onSelectionChanged = listener
-        notifyDataSetChanged()
-    }
-
-    fun exitSelectionMode() {
-        selectionMode = false
-        selectedIds.clear()
-        onSelectionChanged = null
         notifyDataSetChanged()
     }
 

@@ -23,4 +23,14 @@
     <string name="crop">Cut</string>
     <string name="save_changes">Seal Enchantment</string>
     <string name="image_editor">Arcane Editor</string>
+
+    <!-- Album Strings -->
+    <string name="edit_album">Edit Album</string>
+    <string name="btn_edit">Edit</string>
+    <string name="btn_filter">Filter</string>
+    <string name="btn_zip">Zip</string>
+    <string name="btn_add">Add</string>
+    <string name="btn_del">Del</string>
+    <string name="add_count_format">Add (%1$d)</string>
+    <string name="item_count_format">(%1$d)</string>
 </resources>

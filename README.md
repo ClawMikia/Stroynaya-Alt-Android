@@ -64,10 +64,25 @@ The core mission of Stroynaya Alt is to serve as a digital altar for manifesting
 - **Navigation Component**: Robust fragment-based navigation with a single-activity architecture.
 - **Coil**: Modern, coroutine-based image loading.
 - **Coroutines & Flow**: Reactive programming model for smooth UI updates and background processing.
+- **Media3**: For advanced media handling and future video support.
 
 ## 🚀 Getting Started
 
 ### 1. Clone the Repository
 ```bash
-git clone <repository-url>
-cd Stroynaya
+git clone https://github.com/yourusername/Stroynaya-Alt-Android.git
+cd Stroynaya-Alt-Android
+```
+
+### 2. Open in Android Studio
+- Ensure you have Android Studio Hedgehog or newer.
+- Use JDK 17.
+
+### 3. Build and Run
+- Sync Gradle and run the `:app` module on your device or emulator.
+
+## 📜 License
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+---
+*"A dragon breathes fire with no smoke."* - Christopher Lee Cajes

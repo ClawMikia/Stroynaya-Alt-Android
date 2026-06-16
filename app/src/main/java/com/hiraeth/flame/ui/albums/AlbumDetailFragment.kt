@@ -20,7 +20,6 @@ import com.hiraeth.flame.R
 import com.hiraeth.flame.databinding.FragmentAlbumDetailBinding
 import com.hiraeth.flame.ui.library.MediaLibraryAdapter
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 class AlbumDetailFragment : Fragment() {
 
@@ -37,8 +36,8 @@ class AlbumDetailFragment : Fragment() {
     private lateinit var adapter: MediaLibraryAdapter
 
     private val createZipLauncher = registerForActivityResult(ActivityResultContracts.CreateDocument("application/zip")) { uri ->
-        if (uri != null) {
-            viewModel.exportToZip(requireContext(), uri) { success ->
+        uri?.let {
+            viewModel.exportToZip(requireContext(), it) { success ->
                 if (success) {
                     Toast.makeText(requireContext(), "Album exported successfully!", Toast.LENGTH_SHORT).show()
                 } else {
@@ -114,7 +113,7 @@ class AlbumDetailFragment : Fragment() {
         val btnCreate = dialogView.findViewById<com.google.android.material.button.MaterialButton>(R.id.btn_create)
 
         val titleText = (dialogView as? ViewGroup)?.let { findFirstTextView(it) }
-        titleText?.text = "Edit Album"
+        titleText?.text = getString(R.string.edit_album)
 
         inputName.setText(awm.album.name)
         inputDesc.setText(awm.album.description)
@@ -156,7 +155,7 @@ class AlbumDetailFragment : Fragment() {
         inputDesc?.visibility = View.GONE
         (inputDesc?.parent as? View)?.visibility = View.GONE
         (inputDesc?.parent?.parent as? View)?.let { grandParent ->
-            if (grandParent !is ViewGroup || grandParent.id != dialogView.id) {
+            if (grandParent !is ViewGroup || (grandParent.id != dialogView.id)) {
                 grandParent.visibility = View.GONE
             }
         }
@@ -206,7 +205,7 @@ class AlbumDetailFragment : Fragment() {
         recycler.adapter = selectionAdapter
 
         selectionAdapter.enterSelectionMode { count ->
-            btnAdd.text = "Add ($count)"
+            btnAdd.text = getString(R.string.add_count_format, count)
             btnAdd.isEnabled = count > 0
         }
         btnAdd.isEnabled = false

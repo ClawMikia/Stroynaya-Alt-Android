@@ -31,11 +31,13 @@ class GroupedLibraryAdapter(
 
         private val DIFF = object : DiffUtil.ItemCallback<LibraryDisplayItem>() {
             override fun areItemsTheSame(old: LibraryDisplayItem, new: LibraryDisplayItem): Boolean {
-                return if (old is LibraryDisplayItem.Header && new is LibraryDisplayItem.Header) {
+                return if ((old is LibraryDisplayItem.Header && new is LibraryDisplayItem.Header)) {
                     old.id == new.id
-                } else if (old is LibraryDisplayItem.Media && new is LibraryDisplayItem.Media) {
+                } else if ((old is LibraryDisplayItem.Media && new is LibraryDisplayItem.Media)) {
                     old.entity.id == new.entity.id
-                } else false
+                } else {
+                    false
+                }
             }
 
             override fun areContentsTheSame(old: LibraryDisplayItem, new: LibraryDisplayItem): Boolean {
@@ -66,9 +68,11 @@ class GroupedLibraryAdapter(
     }
 
     fun getSelectedItems(): List<MediaEntity> {
-        return currentList.filterIsInstance<LibraryDisplayItem.Media>()
+        return currentList.asSequence()
+            .filterIsInstance<LibraryDisplayItem.Media>()
             .map { it.entity }
             .filter { it.id in selectedIds }
+            .toList()
     }
 
     override fun getItemViewType(position: Int): Int {
@@ -88,12 +92,11 @@ class GroupedLibraryAdapter(
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        val item = getItem(position)
-        when (item) {
+        when (val item = getItem(position)) {
             is LibraryDisplayItem.Header -> {
                 val h = holder as HeaderVH
                 h.binding.headerTitle.text = item.title
-                h.binding.headerCount.text = "(${item.count})"
+                h.binding.headerCount.text = h.itemView.context.getString(com.hiraeth.flame.R.string.item_count_format, item.count)
                 h.itemView.setOnClickListener { onHeaderClick(item.id) }
             }
             is LibraryDisplayItem.Media -> {

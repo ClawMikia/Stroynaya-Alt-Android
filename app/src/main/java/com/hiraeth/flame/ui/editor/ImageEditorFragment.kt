@@ -13,7 +13,6 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import com.hiraeth.flame.HiraethApplication
-import com.hiraeth.flame.R
 import com.hiraeth.flame.databinding.FragmentImageEditorBinding
 import kotlinx.coroutines.launch
 
@@ -53,8 +52,7 @@ class ImageEditorFragment : Fragment() {
 
         binding.btnCrop.setOnClickListener {
             if (binding.cropOverlay.visibility == View.VISIBLE) {
-                val cropped = cropBitmap()
-                if (cropped != null) {
+                cropBitmap()?.let { cropped ->
                     currentBitmap = cropped
                     rotationDegrees = 0f
                     // We keep brightnessValue as it is applied via ColorFilter in updatePreview
@@ -67,8 +65,7 @@ class ImageEditorFragment : Fragment() {
         }
 
         binding.btnSave.setOnClickListener {
-            val bitmapToSave = getFinalBitmap()
-            if (bitmapToSave != null) {
+            getFinalBitmap()?.let { bitmapToSave ->
                 viewModel.saveEditedBitmap(bitmapToSave) {
                     Toast.makeText(requireContext(), "Image saved", Toast.LENGTH_SHORT).show()
                     findNavController().popBackStack()
@@ -96,12 +93,14 @@ class ImageEditorFragment : Fragment() {
         binding.editorImageView.rotation = rotationDegrees
         
         val colorMatrix = ColorMatrix().apply {
-            set(floatArrayOf(
-                1f, 0f, 0f, 0f, brightnessValue,
-                0f, 1f, 0f, 0f, brightnessValue,
-                0f, 0f, 1f, 0f, brightnessValue,
-                0f, 0f, 0f, 1f, 0f
-            ))
+            set(
+                floatArrayOf(
+                    1f, 0f, 0f, 0f, brightnessValue,
+                    0f, 1f, 0f, 0f, brightnessValue,
+                    0f, 0f, 1f, 0f, brightnessValue,
+                    0f, 0f, 0f, 1f, 0f,
+                )
+            )
         }
         binding.editorImageView.colorFilter = ColorMatrixColorFilter(colorMatrix)
     }
@@ -122,7 +121,7 @@ class ImageEditorFragment : Fragment() {
         val bitmapWidth = rotated.width.toFloat()
         val bitmapHeight = rotated.height.toFloat()
         
-        val scale = Math.min(viewWidth / bitmapWidth, viewHeight / bitmapHeight)
+        val scale = kotlin.math.min(viewWidth / bitmapWidth, viewHeight / bitmapHeight)
         val dx = (viewWidth - bitmapWidth * scale) / 2f
         val dy = (viewHeight - bitmapHeight * scale) / 2f
         
@@ -158,12 +157,14 @@ class ImageEditorFragment : Fragment() {
         val canvas = Canvas(result)
         val paint = Paint()
         val colorMatrix = ColorMatrix().apply {
-            set(floatArrayOf(
-                1f, 0f, 0f, 0f, brightnessValue,
-                0f, 1f, 0f, 0f, brightnessValue,
-                0f, 0f, 1f, 0f, brightnessValue,
-                0f, 0f, 0f, 1f, 0f
-            ))
+            set(
+                floatArrayOf(
+                    1f, 0f, 0f, 0f, brightnessValue,
+                    0f, 1f, 0f, 0f, brightnessValue,
+                    0f, 0f, 1f, 0f, brightnessValue,
+                    0f, 0f, 0f, 1f, 0f,
+                )
+            )
         }
         paint.colorFilter = ColorMatrixColorFilter(colorMatrix)
         canvas.drawBitmap(rotated, 0f, 0f, paint)

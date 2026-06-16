@@ -49,7 +49,7 @@ class SplashActivity : AppCompatActivity() {
         animateIn(title, delay)
         animateIn(divider, delay * 2)
         animateIn(quoteContainer, delay * 3)
-        animateIn(quote, delay * 3 + 100)
+        animateIn(quote, (delay * 3 + 100))
         animateIn(author, delay * 4)
 
         Handler(Looper.getMainLooper()).postDelayed({

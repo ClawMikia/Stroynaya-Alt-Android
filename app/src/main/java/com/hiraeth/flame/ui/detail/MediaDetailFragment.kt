@@ -62,20 +62,22 @@ class MediaDetailFragment : Fragment() {
         val transformer = CompositePageTransformer().apply {
             addTransformer(MarginPageTransformer(40))
             addTransformer { page, position ->
-                val r = 1 - Math.abs(position)
-                page.scaleY = 0.90f + r * 0.10f
-                page.alpha = 0.5f + r * 0.5f
+                val r = 1 - kotlin.math.abs(position)
+                page.scaleY = 0.90f + (r * 0.10f)
+                page.alpha = 0.5f + (r * 0.5f)
             }
         }
         binding.viewPager.setPageTransformer(transformer)
         
         // Ensure ViewPager2 takes priority over NestedScrollView for horizontal swipes
-        binding.viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
-            override fun onPageScrollStateChanged(state: Int) {
-                // Disable NestedScrollView scrolling while ViewPager2 is swiping
-                binding.nestedScrollView.isNestedScrollingEnabled = (state == ViewPager2.SCROLL_STATE_IDLE)
-            }
-        })
+        binding.viewPager.registerOnPageChangeCallback(
+            object : ViewPager2.OnPageChangeCallback() {
+                override fun onPageScrollStateChanged(state: Int) {
+                    // Disable NestedScrollView scrolling while ViewPager2 is swiping
+                    binding.nestedScrollView.isNestedScrollingEnabled = (state == ViewPager2.SCROLL_STATE_IDLE)
+                }
+            },
+        )
 
         // Sync Pager -> ViewModel
         binding.viewPager.registerOnPageChangeCallback(
@@ -105,8 +107,7 @@ class MediaDetailFragment : Fragment() {
         binding.btnAddAlbum.setOnClickListener { showAlbumPicker() }
 
         binding.btnEditImage.setOnClickListener {
-            val m = viewModel.media.value
-            if (m != null) {
+            viewModel.media.value?.let { m ->
                 findNavController().navigate(
                     R.id.action_mediaDetail_to_imageEditor,
                     Bundle().apply { putLong("mediaId", m.id) }
