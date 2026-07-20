@@ -152,6 +152,14 @@
                     android:layout_marginTop="8dp"
                     android:text="Add to album" />
 
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_export"
+                    style="@style/Btn.Neon.Tonal"
+                    android:layout_width="match_parent"
+                    android:layout_height="52dp"
+                    android:layout_marginTop="8dp"
+                    android:text="Export Image" />
+
                 <!-- Divider -->
                 <View
                     android:layout_width="match_parent"

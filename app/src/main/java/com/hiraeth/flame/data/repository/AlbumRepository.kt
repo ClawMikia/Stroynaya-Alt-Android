@@ -34,4 +34,32 @@ class AlbumRepository(
     suspend fun deleteAlbum(id: Long) {
         albumDao.deleteAlbumById(id)
     }
+
+    suspend fun getAlbumIdsForMedia(mediaId: Long): List<Long> {
+        return albumDao.getAlbumIdsForMedia(mediaId)
+    }
+
+    suspend fun unlinkFromAllAlbums(mediaId: Long) {
+        albumDao.unlinkMediaFromAllAlbums(mediaId)
+    }
+
+    suspend fun unlinkFromAllAlbumsBulk(mediaIds: List<Long>) {
+        albumDao.unlinkMediaFromAllAlbumsBulk(mediaIds)
+    }
+
+    suspend fun moveToAlbum(sourceAlbumId: Long, targetAlbumId: Long, mediaIds: List<Long>) {
+        if (sourceAlbumId == targetAlbumId) return
+        albumDao.unlinkMediaBulk(sourceAlbumId, mediaIds)
+        val crossRefs = mediaIds.map { AlbumMediaCrossRef(albumId = targetAlbumId, mediaId = it) }
+        albumDao.linkMediaBulk(crossRefs)
+    }
+
+    suspend fun moveToNoAlbum(sourceAlbumId: Long, mediaIds: List<Long>) {
+        albumDao.unlinkMediaBulk(sourceAlbumId, mediaIds)
+    }
+
+    suspend fun bulkAddToAlbum(albumId: Long, mediaIds: List<Long>) {
+        val crossRefs = mediaIds.map { AlbumMediaCrossRef(albumId = albumId, mediaId = it) }
+        albumDao.linkMediaBulk(crossRefs)
+    }
 }

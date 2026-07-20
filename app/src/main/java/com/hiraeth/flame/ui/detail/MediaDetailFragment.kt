@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
@@ -21,6 +22,8 @@ import com.hiraeth.flame.R
 import com.hiraeth.flame.data.db.AlbumWithMedia
 import com.hiraeth.flame.databinding.FragmentMediaDetailBinding
 import com.hiraeth.flame.di.AppContainer
+import com.hiraeth.flame.ui.util.ExportFormat
+import com.hiraeth.flame.ui.util.ExportHelper
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 
@@ -41,6 +44,25 @@ class MediaDetailFragment : Fragment() {
     private lateinit var pagerAdapter: MediaPagerAdapter
     private var cachedAlbums: List<AlbumWithMedia> = emptyList()
     private var isInitialJumpDone = false
+
+    private var pendingExportFormat = ExportFormat.PNG
+    private var pendingExportQuality = 90
+
+    private val exportSingleLauncher = registerForActivityResult(ActivityResultContracts.CreateDocument("*/*")) { uri ->
+        uri?.let {
+            val entity = pendingExportEntity ?: return@let
+            val fmt = pendingExportFormat
+            val qual = pendingExportQuality
+            viewLifecycleOwner.lifecycleScope.launch {
+                Toast.makeText(requireContext(), getString(R.string.exporting), Toast.LENGTH_SHORT).show()
+                val ok = ExportHelper.exportSingleImage(requireContext(), entity, container.mediaRepository, fmt, qual, it)
+                Toast.makeText(requireContext(), if (ok) getString(R.string.export_success) else getString(R.string.export_failed), Toast.LENGTH_SHORT).show()
+            }
+        }
+        pendingExportEntity = null
+    }
+
+    private var pendingExportEntity: com.hiraeth.flame.data.db.MediaEntity? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         _binding = FragmentMediaDetailBinding.inflate(inflater, container, false)
@@ -140,6 +162,15 @@ class MediaDetailFragment : Fragment() {
 
         binding.btnRemoveAlbum.visibility = if (albumId != -1L) View.VISIBLE else View.GONE
 
+        binding.btnExport.setOnClickListener {
+            val m = viewModel.media.value
+            if (m != null && !m.isVideo) {
+                showExportFormatDialog(m)
+            } else {
+                Toast.makeText(requireContext(), "Only images can be exported", Toast.LENGTH_SHORT).show()
+            }
+        }
+
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 launch {
@@ -225,6 +256,41 @@ class MediaDetailFragment : Fragment() {
                 Toast.makeText(requireContext(), "Added to ${names[which]}", Toast.LENGTH_SHORT).show()
             }
             .show()
+    }
+
+    private fun showExportFormatDialog(entity: com.hiraeth.flame.data.db.MediaEntity) {
+        val dialogView = LayoutInflater.from(requireContext()).inflate(R.layout.dialog_export_format, null)
+        val radioPng = dialogView.findViewById<android.widget.RadioButton>(R.id.radio_png)
+        val radioJpg = dialogView.findViewById<android.widget.RadioButton>(R.id.radio_jpg)
+        val qualityRow = dialogView.findViewById<View>(R.id.quality_row)
+        val qualityValue = dialogView.findViewById<android.widget.TextView>(R.id.quality_value)
+        val seekbarQuality = dialogView.findViewById<android.widget.SeekBar>(R.id.seekbar_quality)
+        val btnCancel = dialogView.findViewById<View>(R.id.btn_cancel)
+        val btnExport = dialogView.findViewById<com.google.android.material.button.MaterialButton>(R.id.btn_export)
+
+        seekbarQuality?.progress = 80
+        qualityValue?.text = "90%"
+        radioPng?.setOnCheckedChangeListener { _, checked -> qualityRow?.visibility = if (checked) View.GONE else View.VISIBLE }
+        radioJpg?.setOnCheckedChangeListener { _, checked -> qualityRow?.visibility = if (checked) View.VISIBLE else View.GONE }
+        seekbarQuality?.setOnSeekBarChangeListener(object : android.widget.SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(sb: android.widget.SeekBar?, progress: Int, fromUser: Boolean) { qualityValue?.text = "${progress + 10}%" }
+            override fun onStartTrackingTouch(sb: android.widget.SeekBar?) {}
+            override fun onStopTrackingTouch(sb: android.widget.SeekBar?) {}
+        })
+
+        val dialog = MaterialAlertDialogBuilder(requireContext(), R.style.Dialog_Neon).setView(dialogView).create()
+        btnCancel.setOnClickListener { dialog.dismiss() }
+        btnExport.setOnClickListener {
+            val format = if (radioJpg?.isChecked == true) ExportFormat.JPG else ExportFormat.PNG
+            val quality = (seekbarQuality?.progress ?: 80) + 10
+            pendingExportFormat = format
+            pendingExportQuality = quality
+            pendingExportEntity = entity
+            val ext = if (format == ExportFormat.JPG) "jpg" else "png"
+            exportSingleLauncher.launch("${entity.displayName}.$ext")
+            dialog.dismiss()
+        }
+        dialog.show()
     }
 
     override fun onDestroyView() {

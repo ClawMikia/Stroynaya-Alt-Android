@@ -1,11 +1,13 @@
 package com.hiraeth.flame.ui.library
 
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import coil.load
+import com.hiraeth.flame.R
 import com.hiraeth.flame.data.db.MediaEntity
 import com.hiraeth.flame.databinding.ItemLibraryHeaderBinding
 import com.hiraeth.flame.databinding.ItemMediaGridBinding
@@ -67,6 +69,21 @@ class GroupedLibraryAdapter(
         notifyDataSetChanged()
     }
 
+    fun selectAll() {
+        val mediaIds = currentList
+            .filterIsInstance<LibraryDisplayItem.Media>()
+            .map { it.entity.id }
+        selectedIds.addAll(mediaIds)
+        onSelectionChanged?.invoke(selectedIds.size)
+        notifyDataSetChanged()
+    }
+
+    fun deselectAll() {
+        selectedIds.clear()
+        onSelectionChanged?.invoke(0)
+        notifyDataSetChanged()
+    }
+
     fun getSelectedItems(): List<MediaEntity> {
         return currentList.asSequence()
             .filterIsInstance<LibraryDisplayItem.Media>()
@@ -74,6 +91,8 @@ class GroupedLibraryAdapter(
             .filter { it.id in selectedIds }
             .toList()
     }
+
+    fun getSelectedCount(): Int = selectedIds.size
 
     override fun getItemViewType(position: Int): Int {
         return when (getItem(position)) {
@@ -96,7 +115,7 @@ class GroupedLibraryAdapter(
             is LibraryDisplayItem.Header -> {
                 val h = holder as HeaderVH
                 h.binding.headerTitle.text = item.title
-                h.binding.headerCount.text = h.itemView.context.getString(com.hiraeth.flame.R.string.item_count_format, item.count)
+                h.binding.headerCount.text = h.itemView.context.getString(R.string.item_count_format, item.count)
                 h.itemView.setOnClickListener { onHeaderClick(item.id) }
             }
             is LibraryDisplayItem.Media -> {
@@ -109,6 +128,14 @@ class GroupedLibraryAdapter(
                     holder.binding.title.text = entity.displayName
                     holder.binding.subtitle.text = if (entity.isVideo) "VISION" else "STILL"
                     holder.binding.root.alpha = if (selectionMode && !isSelected) 0.5f else 1.0f
+                    if (selectionMode) {
+                        holder.binding.checkbox.visibility = View.VISIBLE
+                        holder.binding.checkbox.setImageResource(
+                            if (isSelected) R.drawable.ic_checkbox_selected else R.drawable.ic_checkbox_unselected
+                        )
+                    } else {
+                        holder.binding.checkbox.visibility = View.GONE
+                    }
                     holder.itemView.setOnClickListener {
                         if (selectionMode) toggleSelection(entity.id) else onItemClick(entity.id)
                     }
@@ -122,6 +149,14 @@ class GroupedLibraryAdapter(
                     val sizeKb = entity.sizeBytes / 1024
                     holder.binding.subtitle.text = if (entity.isVideo) "Vision · $sizeKb KB" else "Still · $sizeKb KB"
                     holder.binding.root.alpha = if (selectionMode && !isSelected) 0.5f else 1.0f
+                    if (selectionMode) {
+                        holder.binding.checkbox.visibility = View.VISIBLE
+                        holder.binding.checkbox.setImageResource(
+                            if (isSelected) R.drawable.ic_checkbox_selected else R.drawable.ic_checkbox_unselected
+                        )
+                    } else {
+                        holder.binding.checkbox.visibility = View.GONE
+                    }
                     holder.itemView.setOnClickListener {
                         if (selectionMode) toggleSelection(entity.id) else onItemClick(entity.id)
                     }

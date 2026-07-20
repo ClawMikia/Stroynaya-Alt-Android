@@ -6,7 +6,7 @@
     <string name="nav_albums">Ancient Vaults</string>
     <string name="fullscreen">Full Realm</string>
     <string name="splash_credit">\"Визуализируй своё предкартиние эстетично. Любая человеческая фигура любви, принимающая падение и взлёт.\"</string>
-    <string name="splash_author">- Christopher Lee Cajes</string>
+    <string name="splash_author">- A friendly kid of this inspirational app :)</string>
     <string name="nav_previous">Previous Soul</string>
     <string name="nav_next">Next Soul</string>
     <string name="media_index_format">%1$d of %2$d</string>
@@ -33,4 +33,33 @@
     <string name="btn_del">Del</string>
     <string name="add_count_format">Add (%1$d)</string>
     <string name="item_count_format">(%1$d)</string>
+
+    <!-- Selection Mode -->
+    <string name="selected_count">Selected: %1$d</string>
+    <string name="select_all">Select All</string>
+    <string name="deselect_all">Deselect All</string>
+    <string name="move_to_album">Move to Album</string>
+    <string name="export_images">Export</string>
+    <string name="cancel_selection">Cancel</string>
+    <string name="no_album">No Album</string>
+
+    <!-- Export -->
+    <string name="export_format_title">Export Format</string>
+    <string name="export_png">PNG (lossless)</string>
+    <string name="export_jpg">JPG (lossy)</string>
+    <string name="export_quality">Quality:</string>
+    <string name="export_image">Export Image</string>
+    <string name="exporting">Exporting…</string>
+    <string name="export_success">Exported successfully!</string>
+    <string name="export_failed">Export failed</string>
+
+    <!-- Move -->
+    <string name="move_to">Move to Album</string>
+    <string name="move_success">Moved %1$d items</string>
+    <string name="move_failed">Move failed</string>
+
+    <!-- Delete selected -->
+    <string name="delete_selected_title">Delete Items</string>
+    <string name="delete_selected_message">Are you sure you want to delete %1$d items from the library?</string>
+    <string name="delete_selected_success">Deleted %1$d items</string>
 </resources>

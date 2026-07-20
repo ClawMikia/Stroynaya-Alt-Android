@@ -31,4 +31,19 @@ interface AlbumDao {
 
     @Query("DELETE FROM albums WHERE id = :id")
     suspend fun deleteAlbumById(id: Long)
+
+    @Query("SELECT albumId FROM album_media WHERE mediaId = :mediaId")
+    suspend fun getAlbumIdsForMedia(mediaId: Long): List<Long>
+
+    @Query("DELETE FROM album_media WHERE mediaId = :mediaId")
+    suspend fun unlinkMediaFromAllAlbums(mediaId: Long)
+
+    @Query("DELETE FROM album_media WHERE mediaId IN (:mediaIds)")
+    suspend fun unlinkMediaFromAllAlbumsBulk(mediaIds: List<Long>)
+
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    suspend fun linkMediaBulk(crossRefs: List<AlbumMediaCrossRef>)
+
+    @Query("DELETE FROM album_media WHERE albumId = :albumId AND mediaId IN (:mediaIds)")
+    suspend fun unlinkMediaBulk(albumId: Long, mediaIds: List<Long>)
 }
